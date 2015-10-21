@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,7 +16,7 @@ namespace NetAppsAssignmentTwo
             ROWS = 320;
 
         private Cell[,] cells;
-        private Rectangle[][] cellRectangles;
+        private HashSet<Rectangle>[] cellRectangles;
 
         public Palette palette { private get; set; }
 
@@ -55,10 +56,10 @@ namespace NetAppsAssignmentTwo
 
         private void InitializeGraphics()
         {
-            cellRectangles = new Rectangle[CellState.NUM_STATES][];
+            cellRectangles = new HashSet<Rectangle>[CellState.NUM_STATES];
 
             for (int s = 0; s < CellState.NUM_STATES; s++)
-                cellRectangles[s] = new Rectangle[CellGrid.COLS * CellGrid.ROWS];
+                cellRectangles[s] = new HashSet<Rectangle>();
         }
 
         public void Randomize(int seed)
@@ -110,22 +111,27 @@ namespace NetAppsAssignmentTwo
 
         public void Draw(Graphics graphics)
         {
-            Parallel.For(0, CellState.NUM_STATES, s =>
-            {
-                Array.Clear(cellRectangles[s], 0, cellRectangles[s].Length);
-            });
+            for(int s = 0; s < CellState.NUM_STATES; s++)
+                cellRectangles[s].Clear();
 
             GridLoopParallel((x, y) =>
             {
-                cellRectangles[cells[x, y].state][x + COLS * y]
-                    = cells[x, y].visualRect;
+                Cell currentCell = cells[x, y];
+                int stateId = currentCell.state;
+                lock (cellRectangles) { cellRectangles[stateId].Add(currentCell.visualRect); }
+            });
+
+            Rectangle[][] rectArray = new Rectangle[CellState.NUM_STATES][];
+            Parallel.For(0, CellState.NUM_STATES, s =>
+            {
+                rectArray[s] = cellRectangles[s].ToArray();
             });
 
             for(int s = 0; s < CellState.NUM_STATES; s++)
             {
                 Color cellColor = palette.StateToColor(s);
                 Brush cellBrush = new SolidBrush(cellColor);
-                graphics.FillRectangles(cellBrush, cellRectangles[s]);
+                graphics.FillRectangles(cellBrush, rectArray[s]);
             }
         }
     }
