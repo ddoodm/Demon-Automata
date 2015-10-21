@@ -15,12 +15,14 @@ namespace NetAppsAssignmentTwo
     public abstract class Palette
     {
         protected Color[] clut;
+        protected Brush[] brushes;
 
         protected Palette () { }
 
         protected Palette(uint colorCount)
         {
             clut = new Color[colorCount];
+            brushes = new Brush[colorCount];
         }
 
         public static Palette MakePalette(PaletteName name)
@@ -39,9 +41,20 @@ namespace NetAppsAssignmentTwo
             }
         }
 
+        protected void ClutToBrushes()
+        {
+            for(int i = 0; i < clut.Length; i++)
+                brushes[i] = new SolidBrush(clut[i]);
+        }
+
         public virtual Color StateToColor(CellState state)
         {
             return clut[state];
+        }
+
+        public virtual Brush StateToBrush(CellState state)
+        {
+            return brushes[state];
         }
     }
 
@@ -60,6 +73,8 @@ namespace NetAppsAssignmentTwo
                     (int)(luminance),
                     55);
             }
+
+            ClutToBrushes();
         }
     }
 
@@ -78,6 +93,8 @@ namespace NetAppsAssignmentTwo
                     225 - (int)(luminance * 100f),
                     255 - (int)(luminance * 25f));
             }
+
+            ClutToBrushes();
         }
     }
 
@@ -96,24 +113,26 @@ namespace NetAppsAssignmentTwo
                     240 - (int)(luminance * 200f),
                     180 - (int)(luminance * 180f));
             }
+
+            ClutToBrushes();
         }
     }
 
     public class RainbowPalette : Palette
     {
-        private Color[] rainbowPal;
+        private Brush[] rainbowPal;
 
         public RainbowPalette ()
         {
-            rainbowPal = new Color[]
+            rainbowPal = new Brush[]
             {
-                Color.Red, Color.DarkViolet, Color.Blue,
-                Color.LightBlue, Color.DarkGreen, Color.Green,
-                Color.Yellow, Color.Orange
+                Brushes.Red, Brushes.DarkViolet, Brushes.Blue,
+                Brushes.LightBlue, Brushes.DarkGreen, Brushes.Green,
+                Brushes.Yellow, Brushes.Orange
             };
         }
 
-        public override Color StateToColor(CellState state)
+        public override Brush StateToBrush(CellState state)
         {
             return rainbowPal[state % rainbowPal.Length];
         }
@@ -131,6 +150,8 @@ namespace NetAppsAssignmentTwo
                 clut[i] = Color.LightGray;
             for (; i < clut.Length; i++)
                 clut[i] = Color.Black;
+
+            ClutToBrushes();
         }
     }
 
@@ -146,6 +167,8 @@ namespace NetAppsAssignmentTwo
                     random.Next() % MAX_LUM,
                     random.Next() % MAX_LUM,
                     random.Next() % MAX_LUM);
+
+            ClutToBrushes();
         }
     }
 }

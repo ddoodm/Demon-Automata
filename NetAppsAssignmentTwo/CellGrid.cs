@@ -16,7 +16,7 @@ namespace NetAppsAssignmentTwo
             ROWS = 320;
 
         private Cell[,] cells;
-        private HashSet<Rectangle>[] cellRectangles;
+        private List<Rectangle>[] cellRectangles;
 
         public Palette palette { private get; set; }
 
@@ -56,10 +56,10 @@ namespace NetAppsAssignmentTwo
 
         private void InitializeGraphics()
         {
-            cellRectangles = new HashSet<Rectangle>[CellState.NUM_STATES];
+            cellRectangles = new List<Rectangle>[CellState.NUM_STATES];
 
             for (int s = 0; s < CellState.NUM_STATES; s++)
-                cellRectangles[s] = new HashSet<Rectangle>();
+                cellRectangles[s] = new List<Rectangle>();
         }
 
         public void Randomize(int seed)
@@ -74,6 +74,28 @@ namespace NetAppsAssignmentTwo
 
         public void RunAutomata(AutomataRule rule)
         {
+            Action automataAction;
+
+            switch(rule)
+            {
+                default:
+                case AutomataRule.Orthogonal:
+                    automataAction = () => RunAutomata(Cell.OrthogonalRule);
+                    break;
+                case AutomataRule.Diagonal:
+                    automataAction = () => RunAutomata(Cell.DiagonalRule);
+                    break;
+                case AutomataRule.Alternating:
+                    automataAction = () => RunAutomata(Cell.OrthogonalRule);
+                    automataAction += () => RunAutomata(Cell.DiagonalRule);
+                    break;
+            }
+
+            automataAction();
+        }
+
+        private void RunAutomata(Cell.RuleDelegate rule)
+        {
             // Compute the next state for each cell, do not apply yet
             GridLoopParallel((x, y) =>
             {
@@ -81,7 +103,7 @@ namespace NetAppsAssignmentTwo
             });
 
             // Apply the temp. states after computation is complete
-            GridLoopParallel((x, y) =>
+            GridLoop((x, y) =>
             {
                 cells[x, y].ApplyTempState();
             });
@@ -129,8 +151,10 @@ namespace NetAppsAssignmentTwo
 
             for(int s = 0; s < CellState.NUM_STATES; s++)
             {
-                Color cellColor = palette.StateToColor(s);
-                Brush cellBrush = new SolidBrush(cellColor);
+                if (rectArray[s].Length < 1)
+                    continue;
+
+                Brush cellBrush = palette.StateToBrush(s);
                 graphics.FillRectangles(cellBrush, rectArray[s]);
             }
         }

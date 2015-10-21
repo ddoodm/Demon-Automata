@@ -40,21 +40,7 @@ namespace NetAppsAssignmentTwo
                 new Size(CELL_SIZE, CELL_SIZE));
         }
 
-        public void ComputeNextState(AutomataRule ruleName)
-        {
-            switch(ruleName)
-            {
-                default:
-                case AutomataRule.Orthogonal:
-                    ComputeNextState(OrthogonalRule);
-                    break;
-                case AutomataRule.Diagonal:
-                    ComputeNextState(DiagonalRule);
-                    break;
-            }
-        }
-
-        private void ComputeNextState(RuleDelegate ruleAppliesFor)
+        public void ComputeNextState(RuleDelegate ruleAppliesFor)
         {
             IVec2 offset;
 
@@ -69,7 +55,7 @@ namespace NetAppsAssignmentTwo
                     if (ruleAppliesFor(offset))
                         continue;
 
-                    // Obtain this cell's neighbor at offset (i,j) from the grid
+                    // Obtain this cell's neighbor at offset (x,y) from the grid
                     Cell neighbor = grid.GetNeighborFor(this, offset);
 
                     // If any of the cell’s four ... neighbours has
@@ -82,13 +68,13 @@ namespace NetAppsAssignmentTwo
             tempState = this.state;
         }
 
-        private static bool OrthogonalRule(IVec2 relativeCoords)
+        public static bool OrthogonalRule(IVec2 relativeCoords)
         {
             // Do not calculate diagonal neighbors
             return Math.Abs(relativeCoords.x) == Math.Abs(relativeCoords.y);
         }
 
-        private static bool DiagonalRule(IVec2 relativeCoords)
+        public static bool DiagonalRule(IVec2 relativeCoords)
         {
             // Do not calculate orthogonal neighbors
             return Math.Abs(relativeCoords.x) != Math.Abs(relativeCoords.y);
@@ -107,11 +93,6 @@ namespace NetAppsAssignmentTwo
         public void Randomize(Random r)
         {
             state = r.Next(CellState.NUM_STATES);
-        }
-
-        public void AdvanceState()
-        {
-            state = nextState;
         }
     }
 }

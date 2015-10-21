@@ -44,13 +44,30 @@ namespace NetAppsAssignmentTwo
             cellGrid = new CellGrid(Palette.MakePalette(INITIAL_PALETTE));
             cellGrid.Randomize(0);
 
-            initializeGraphics();
+            InitializeFormSize();
+
+            InitializeGraphics();
             renderImage();
 
             InitializeControlValues();
         }
 
-        private void initializeGraphics()
+        private void InitializeFormSize()
+        {
+            panel_display.Size = new Size(
+                CellGrid.ROWS * Cell.CELL_SIZE,
+                CellGrid.COLS * Cell.CELL_SIZE);
+
+            int displayHeight = panel_display.Height;
+            int controlPanelHeight = panel_controls.Height;
+            int statusStripHeight = statusStrip.Height;
+
+            this.Size = new Size(
+                panel_display.Width,
+                displayHeight + controlPanelHeight + statusStripHeight);
+        }
+
+        private void InitializeGraphics()
         {
             // Dispose old graphics resources
             if (panelGraphics != null) panelGraphics.Dispose();
