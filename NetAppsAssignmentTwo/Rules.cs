@@ -8,6 +8,6 @@ namespace NetAppsAssignmentTwo
 {
     public enum AutomataRule
     {
-        Orthogonal, Diagonal, Alternating
+        Orthogonal, Diagonal, Alternating, CustomRule
     }
 }

@@ -5,16 +5,26 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
 
-namespace NetAppsAssignmentTwo
+namespace NetAppsAssignmentTwo.Palettes
 {
+    /// <summary>
+    /// Names for the available colour palettes
+    /// </summary>
     public enum PaletteName
     {
-        HighTech, Banana, BlueCandy, Rainbow, Contrast, Random
+        HighTech, Vintage, SoapyWater, Rainbow, Contrast, Random
     }
 
     public abstract class Palette
     {
+        /// <summary>
+        /// The colour lookup table that this palette defines
+        /// </summary>
         protected Color[] clut;
+
+        /// <summary>
+        /// The brushes that correspond to the colour lookup table
+        /// </summary>
         protected Brush[] brushes;
 
         protected Palette () { }
@@ -25,33 +35,46 @@ namespace NetAppsAssignmentTwo
             brushes = new Brush[colorCount];
         }
 
-        public static Palette MakePalette(PaletteName name)
+        /// <summary>
+        /// The Palette Factory
+        /// Creates a Palette given a Palette Name
+        /// </summary>
+        /// <param name="name">The name (enum) of the palette to create</param>
+        /// <returns>A new palette of the type specified by 'name'</returns>
+        public static Palette MakePalette(PaletteName name, uint colorCount = CellState.NUM_STATES)
         {
-            uint colorCount = CellState.NUM_STATES;
-
             switch(name)
             {
                 default:
                 case PaletteName.HighTech: return new HighTechPalette(colorCount);
-                case PaletteName.BlueCandy: return new BlueCandyPalette(colorCount);
-                case PaletteName.Banana: return new BananaPalette(colorCount);
+                case PaletteName.SoapyWater: return new SoapyWaterPalette(colorCount);
+                case PaletteName.Vintage: return new VintagePalette(colorCount);
                 case PaletteName.Rainbow: return new RainbowPalette();
                 case PaletteName.Contrast: return new ContrastPalette(colorCount);
                 case PaletteName.Random: return new RandomPalette(colorCount);
             }
         }
 
+        /// <summary>
+        /// Generate the array of Brush from the CLUT
+        /// </summary>
         protected void ClutToBrushes()
         {
             for(int i = 0; i < clut.Length; i++)
                 brushes[i] = new SolidBrush(clut[i]);
         }
 
+        /// <summary>
+        /// Convert a state number to a Color
+        /// </summary>
         public virtual Color StateToColor(CellState state)
         {
             return clut[state];
         }
 
+        /// <summary>
+        /// Convert a state number to a Brush
+        /// </summary>
         public virtual Brush StateToBrush(CellState state)
         {
             return brushes[state];
@@ -60,27 +83,61 @@ namespace NetAppsAssignmentTwo
 
     public class HighTechPalette : Palette
     {
+        private const float BRIGHTNESS = 200.0f;
+        private const int BLUE_BASE = 55;
+
         public HighTechPalette(uint colorCount)
             : base(colorCount)
         {
             // Compute the color lookup table
             for(int i = 0; i < clut.Length; i++)
             {
-                float luminance = (float)i / (float)clut.Length * 200.0f;
+                float luminance = (float)i / (float)clut.Length * BRIGHTNESS;
 
-                clut[i] = Color.FromArgb(
-                    0,
-                    (int)(luminance),
-                    55);
+                clut[i] = Color.FromArgb(0, (int)(luminance), BLUE_BASE);
             }
 
             ClutToBrushes();
         }
     }
 
-    public class BlueCandyPalette : Palette
+    public class SoapyWaterPalette : Palette
     {
-        public BlueCandyPalette(uint colorCount)
+        private const float
+            BRIGHTNESS = 200.0f,
+            FALLOFF = 100.0f;
+        private const int
+            BASE_BRIGHTNESS = 200,
+            SHIFT = 20;
+
+        public SoapyWaterPalette(uint colorCount)
+            : base(colorCount)
+        {
+            // Compute the color lookup table
+            for (int i = 0; i < clut.Length; i++)
+            {
+                float luminance = (float)i / (float)clut.Length;
+                int brightness = BASE_BRIGHTNESS;
+
+                clut[i] = Color.FromArgb(
+                    brightness - (int)(luminance * BRIGHTNESS),
+                    brightness += SHIFT - (int)(luminance * (BRIGHTNESS - FALLOFF)),
+                    brightness += SHIFT - (int)(luminance * (BRIGHTNESS - FALLOFF - FALLOFF)));
+            }
+
+            ClutToBrushes();
+        }
+    }
+
+    public class VintagePalette : Palette
+    {
+        private const int
+            RED_BASE = 225, GREEN_BASE = 240, BLUE_BASE = 180;
+
+        private const float
+            RED_CHROM = 50.0f, GREEN_CHROM = 200.0f, BLUE_CHROM = 180.0f;
+
+        public VintagePalette(uint colorCount)
             : base(colorCount)
         {
             // Compute the color lookup table
@@ -89,29 +146,9 @@ namespace NetAppsAssignmentTwo
                 float luminance = (float)i / (float)clut.Length;
 
                 clut[i] = Color.FromArgb(
-                    200 - (int)(luminance * 200f),
-                    225 - (int)(luminance * 100f),
-                    255 - (int)(luminance * 25f));
-            }
-
-            ClutToBrushes();
-        }
-    }
-
-    public class BananaPalette : Palette
-    {
-        public BananaPalette(uint colorCount)
-            : base(colorCount)
-        {
-            // Compute the color lookup table
-            for (int i = 0; i < clut.Length; i++)
-            {
-                float luminance = (float)i / (float)clut.Length;
-
-                clut[i] = Color.FromArgb(
-                    225 - (int)(luminance * 50f),
-                    240 - (int)(luminance * 200f),
-                    180 - (int)(luminance * 180f));
+                    RED_BASE - (int)(luminance * RED_CHROM),
+                    GREEN_BASE - (int)(luminance * GREEN_CHROM),
+                    BLUE_BASE - (int)(luminance * BLUE_CHROM));
             }
 
             ClutToBrushes();
@@ -127,7 +164,7 @@ namespace NetAppsAssignmentTwo
             rainbowPal = new Brush[]
             {
                 Brushes.Red, Brushes.DarkViolet, Brushes.Blue,
-                Brushes.LightBlue, Brushes.DarkGreen, Brushes.Green,
+                Brushes.LightBlue, Brushes.Navy, Brushes.Green,
                 Brushes.Yellow, Brushes.Orange
             };
         }
