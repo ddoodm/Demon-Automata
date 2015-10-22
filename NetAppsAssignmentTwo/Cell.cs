@@ -1,6 +1,5 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
@@ -36,9 +35,8 @@ namespace NetAppsAssignmentTwo
         /// <summary>
         /// Defines the 'neighbor skipping rule' to be applied.
         /// </summary>
-        /// <param name="relativeCoords">The 2D coordinates of this cell in the grid</param>
         /// <returns>True if this neighbor should be skipped, false otherwise.</returns>
-        public delegate bool RuleDelegate(IVec2 relativeCoords);
+        public delegate bool RuleDelegate(int relativeX, int relativeY);
 
         /// <summary>
         /// A reference to the parent cell grid
@@ -79,27 +77,27 @@ namespace NetAppsAssignmentTwo
         /// <param name="ruleAppliesFor">The 'neighbor skipping rule' to apply</param>
         public void ComputeNextState(RuleDelegate ruleAppliesFor)
         {
-            IVec2 offset;
-
-            for (offset.x = -1; offset.x <= 1; offset.x++)
-                for (offset.y = -1; offset.y <= 1; offset.y++)
+            for (int x = -1; x <= 1; x++)
+            {
+                for (int y = -1; y <= 1; y++)
                 {
                     // Skip the middle cell (self)
-                    if (offset.x == 0 && offset.y == 0)
+                    if (x == 0 && y == 0)
                         continue;
 
                     // Apply the skipping rule
-                    if (ruleAppliesFor(offset))
+                    if (ruleAppliesFor(x, y))
                         continue;
 
                     // Obtain this cell's neighbor at offset (x,y) from the grid
-                    Cell neighbor = grid.GetNeighborFor(this, offset);
+                    Cell neighbor = grid.GetNeighborFor(this, x, y);
 
-                    // If any of the cell’s four ... neighbours has
+                    // If any of the cell?s four ... neighbours has
                     // the next state on from the cell
                     if (state.nextState == neighbor.state)
                     { tempState = state.nextState; return; }
                 }
+            }
 
             // No rules were met; return the current state
             tempState = this.state;
@@ -108,33 +106,30 @@ namespace NetAppsAssignmentTwo
         /// <summary>
         /// Skips diagonal neighbors
         /// </summary>
-        /// <param name="relativeCoords">The relative coordinates of the neighbor</param>
         /// <returns>True if the neighbor should be skipped</returns>
-        public static bool OrthogonalRule(IVec2 relativeCoords)
+        public static bool OrthogonalRule(int relativeX, int relativeY)
         {
-            return Utility.IntAbs(relativeCoords.x) == Utility.IntAbs(relativeCoords.y);
+            return Utility.IntAbs(relativeX) == Utility.IntAbs(relativeY);
         }
 
         /// <summary>
         /// Skips orthogonal neighbors
         /// </summary>
-        /// <param name="relativeCoords">The relative coordinates of the neighbor</param>
         /// <returns>True if the neighbor should be skipped</returns>
-        public static bool DiagonalRule(IVec2 relativeCoords)
+        public static bool DiagonalRule(int relativeX, int relativeY)
         {
             // Do not calculate orthogonal neighbors
-            return Utility.IntAbs(relativeCoords.x) != Utility.IntAbs(relativeCoords.y);
+            return Utility.IntAbs(relativeX) != Utility.IntAbs(relativeY);
         }
 
         /// <summary>
         /// Skips cells on a corner
         /// </summary>
-        /// <param name="relativeCoords">The relative coordinates of the neighbor</param>
         /// <returns>True if the neighbor should be skipped</returns>
-        public static bool CustomRule(IVec2 relativeCoords)
+        public static bool CustomRule(int relativeX, int relativeY)
         {
             // Calculate cells for one corner
-            return relativeCoords.x + relativeCoords.y > 0;
+            return relativeX + relativeY > 0;
         }
 
         /// <summary>

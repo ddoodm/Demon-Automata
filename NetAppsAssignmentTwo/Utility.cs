@@ -39,11 +39,13 @@ namespace NetAppsAssignmentTwo
         /// <param name="theComparisons">The objects to compare with</param>
         /// <returns>True if any of theComparisons matches theEnum</returns>
         public static bool EnumIsAnyOf<T>(T theComparitor, params T[] theComparisons)
-            where T : struct, IConvertible
+            where T : IConvertible
         {
             foreach (T comp in theComparisons)
+            {
                 if (theComparitor.Equals(comp))
                     return true;
+            }
             return false;
         }
     }

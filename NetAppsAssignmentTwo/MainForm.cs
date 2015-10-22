@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
-using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -80,15 +79,17 @@ namespace NetAppsAssignmentTwo
                 CellGrid.ROWS * Cell.CELL_SIZE);
 
             // Obtain sizes of form panels
-            int displayHeight = panel_display.Height;
+            int displayHeight = panel_display.Height + panel_display.Margin.Bottom;
             int controlPanelHeight = panel_controls.Height;
             int statusStripHeight = statusStrip.Height;
+            int captionHeight = SystemInformation.CaptionHeight;
+            int displayY = panel_display.Location.Y;
 
             // Resize the form to fit all panels.
             // Anchors automatically position child components
             this.Size = new Size(
                 panel_display.Width,
-                displayHeight + controlPanelHeight + statusStripHeight);
+                statusStripHeight + displayY + displayHeight + statusStripHeight);
         }
 
         /// <summary>
@@ -162,7 +163,9 @@ namespace NetAppsAssignmentTwo
             int? seed = ParseControlTextToInt<TextBox>(tb_seed);
             if(!seed.HasValue)
             {
-                MessageBox.Show("Failed to reset the grid.\nThe seed is invalid. Please supply an integer.");
+                MessageBox.Show(
+                    "Failed to reset the grid.\n" +
+                    "The seed is invalid. Please supply an integer.");
                 return;
             }
 
@@ -189,7 +192,9 @@ namespace NetAppsAssignmentTwo
             int? generations = ParseControlTextToInt<TextBox>(tb_gens);
             if (!generations.HasValue || generations.Value <= 0)
             {
-                MessageBox.Show("Failed to start Demon.\n\"Gens\" must be an integer greater than 0.");
+                MessageBox.Show(
+                    "Failed to start Demon.\n" +
+                    "\"Gens\" must be an integer greater than 0.");
                 return;
             }
 
@@ -217,24 +222,44 @@ namespace NetAppsAssignmentTwo
             computeThread = new Thread(() =>
             {
                 // Disable form controls
-                this.Invoke((Action)(() => panel_controls.Enabled = false));
+                this.Invoke((Action<bool>)SetControlsEnabled, false);
 
-                for (int gen = 1; gen <= generations; gen++)
-                {
-                    // Compute this generation and render
-                    cellGrid.RunAutomata(rule);
-                    RenderImage();
-
-                    // Update the generation count UI
-                    this.Invoke((UiStatusUpdateDelegate)UpdateGenerationUI, gen);
-                }
+                // Execute the loop
+                AutomataLoop(rule, generations);
 
                 // Compute and display the final hash, and enable the controls
                 this.Invoke((Action)DisplayHash);
-                this.Invoke((Action)(() => panel_controls.Enabled = true));
+                this.Invoke((Action<bool>)SetControlsEnabled, true);
             });
 
             computeThread.Start();
+        }
+
+        /// <summary>
+        /// Runs the automata loop
+        /// </summary>
+        /// <param name="rule">The skipping rule to apply</param>
+        /// <param name="generations">The number of times to run the loop</param>
+        private void AutomataLoop(AutomataRule rule, int generations)
+        {
+            for (int gen = 1; gen <= generations; gen++)
+            {
+                // Compute this generation and render
+                cellGrid.RunAutomata(rule);
+                RenderImage();
+
+                // Update the generation count UI
+                this.Invoke((UiStatusUpdateDelegate)UpdateGenerationUI, gen);
+            }
+        }
+
+        /// <summary>
+        /// Sets whether the control panel is enabled for user interaction
+        /// </summary>
+        /// <param name="enabmed">Whether the control panel is enabled</param>
+        public void SetControlsEnabled(bool enabmed)
+        {
+            panel_controls.Enabled = enabmed;
         }
 
         /// <summary>
@@ -264,10 +289,11 @@ namespace NetAppsAssignmentTwo
         /// <typeparam name="ControlType">The type of the control</typeparam>
         /// <param name="control">The control</param>
         /// <returns>The text value of the control as an integer, null otherwise</returns>
-        private int? ParseControlTextToInt<ControlType>(object control) where ControlType : Control
+        private int? ParseControlTextToInt<ControlType>(ControlType control)
+            where ControlType : Control
         {
             int newValue;
-            if (int.TryParse(((ControlType)control).Text, out newValue))
+            if (int.TryParse(control.Text, out newValue))
                 return newValue;
             return null;
         }

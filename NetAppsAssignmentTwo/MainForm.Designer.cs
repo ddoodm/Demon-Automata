@@ -52,6 +52,7 @@
             // panel_display
             // 
             this.panel_display.Location = new System.Drawing.Point(0, 75);
+            this.panel_display.Margin = new System.Windows.Forms.Padding(0, 0, 0, 20);
             this.panel_display.Name = "panel_display";
             this.panel_display.Size = new System.Drawing.Size(640, 480);
             this.panel_display.TabIndex = 0;

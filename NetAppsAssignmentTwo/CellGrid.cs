@@ -1,7 +1,6 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,6 +10,14 @@ using NetAppsAssignmentTwo.Palettes;
 
 namespace NetAppsAssignmentTwo
 {
+    /// <summary>
+    /// Names for automata skipping rules
+    /// </summary>
+    public enum AutomataRule
+    {
+        Orthogonal, Diagonal, Alternating, CustomRule
+    }
+
     /// <summary>
     /// A grid of Cells
     /// </summary>
@@ -60,8 +67,10 @@ namespace NetAppsAssignmentTwo
         private void GridLoop(Action<int,int> body)
         {
             for (int y = 0; y < ROWS; y++)
+            {
                 for (int x = 0; x < COLS; x++)
                     body(x, y);
+            }
         }
 
         /// <summary>
@@ -168,17 +177,15 @@ namespace NetAppsAssignmentTwo
         /// Gets the cell that is a neighbor to the specified cell
         /// </summary>
         /// <param name="cell">The cell for which to find a neighbor</param>
-        /// <param name="offset">The relative offset to the neighbor from the cell</param>
         /// <returns>The neighbor at the specified offset from the cell</returns>
-        public Cell GetNeighborFor(Cell cell, IVec2 offset)
+        public Cell GetNeighborFor(Cell cell, int offsetX, int offsetY)
         {
             // Obtain the 'world wrapped' cell coordinates
-            IVec2 wrappedPos = new IVec2(
-                Utility.WrapModulo(cell.position.x + offset.x, CellGrid.COLS),
-                Utility.WrapModulo(cell.position.y + offset.y, CellGrid.ROWS));
+            int wrappedX = Utility.WrapModulo(cell.position.x + offsetX, CellGrid.COLS);
+            int wrappedY = Utility.WrapModulo(cell.position.y + offsetY, CellGrid.ROWS);
 
             // Obtain the cell
-            return cells[wrappedPos.x, wrappedPos.y];
+            return cells[wrappedX, wrappedY];
         }
 
         /// <summary>

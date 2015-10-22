@@ -47,7 +47,7 @@
     <Compile Include="Cell.cs" />
     <Compile Include="CellGrid.cs" />
     <Compile Include="CellState.cs" />
-    <Compile Include="ColourPalettes.cs" />
+    <Compile Include="Palette.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -55,9 +55,14 @@
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
     <Compile Include="IVec2.cs" />
+    <Compile Include="Palettes\ContrastPalette.cs" />
+    <Compile Include="Palettes\HighTechPalette.cs" />
+    <Compile Include="Palettes\RainbowPalette.cs" />
+    <Compile Include="Palettes\RandomPalette.cs" />
+    <Compile Include="Palettes\SoapyWaterPalette.cs" />
+    <Compile Include="Palettes\VintagePalette.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Rules.cs" />
     <Compile Include="Utility.cs" />
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
