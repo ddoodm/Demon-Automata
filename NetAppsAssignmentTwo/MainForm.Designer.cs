@@ -45,6 +45,7 @@
             this.combo_rules = new System.Windows.Forms.ComboBox();
             this.combo_colours = new System.Windows.Forms.ComboBox();
             this.panel_controls = new System.Windows.Forms.Panel();
+            this.cbRandom = new System.Windows.Forms.CheckBox();
             this.statusStrip.SuspendLayout();
             this.panel_controls.SuspendLayout();
             this.SuspendLayout();
@@ -201,6 +202,7 @@
             // 
             this.panel_controls.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.panel_controls.Controls.Add(this.cbRandom);
             this.panel_controls.Controls.Add(this.tb_seed);
             this.panel_controls.Controls.Add(this.combo_colours);
             this.panel_controls.Controls.Add(this.btn_reset);
@@ -215,6 +217,16 @@
             this.panel_controls.Name = "panel_controls";
             this.panel_controls.Size = new System.Drawing.Size(641, 74);
             this.panel_controls.TabIndex = 12;
+            // 
+            // cbRandom
+            // 
+            this.cbRandom.AutoSize = true;
+            this.cbRandom.Location = new System.Drawing.Point(424, 43);
+            this.cbRandom.Name = "cbRandom";
+            this.cbRandom.Size = new System.Drawing.Size(79, 17);
+            this.cbRandom.TabIndex = 12;
+            this.cbRandom.Text = "Randomize";
+            this.cbRandom.UseVisualStyleBackColor = true;
             // 
             // MainForm
             // 
@@ -255,6 +267,7 @@
         private System.Windows.Forms.ToolStripProgressBar progress_generations;
         private System.Windows.Forms.ToolStripStatusLabel status_generation;
         private System.Windows.Forms.ToolStripStatusLabel status_hash;
+        private System.Windows.Forms.CheckBox cbRandom;
 
     }
 }

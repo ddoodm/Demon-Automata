@@ -14,7 +14,7 @@ namespace NetAppsAssignmentTwo
         /// <summary>
         /// The visual (draw) size of the cell
         /// </summary>
-        public const int CELL_SIZE = 2;
+        public const int CELL_SIZE = 4;
 
         /// <summary>
         /// The coordinates of this cell in the grid
@@ -43,6 +43,8 @@ namespace NetAppsAssignmentTwo
         /// </summary>
         private CellGrid grid;
 
+        private Random rand;
+
         /// <summary>
         /// Instantiate a new Cell
         /// </summary>
@@ -55,6 +57,8 @@ namespace NetAppsAssignmentTwo
             state = 0;
 
             InitGraphics();
+
+            rand = new Random();
         }
 
         /// <summary>
@@ -75,8 +79,10 @@ namespace NetAppsAssignmentTwo
         /// Compute the automata for this cell
         /// </summary>
         /// <param name="ruleAppliesFor">The 'neighbor skipping rule' to apply</param>
-        public void ComputeNextState(RuleDelegate ruleAppliesFor)
+        public void ComputeNextState(RuleDelegate ruleAppliesFor, bool randomize)
         {
+            CellState nextState;
+
             for (int x = -1; x <= 1; x++)
             {
                 for (int y = -1; y <= 1; y++)
@@ -94,8 +100,9 @@ namespace NetAppsAssignmentTwo
 
                     // If any of the cell?s four ... neighbours has
                     // the next state on from the cell
-                    if (state.nextState == neighbor.state)
-                    { tempState = state.nextState; return; }
+                    nextState = state.nextState + (randomize? rand.Next(-1, 1) : 0);
+                    if (nextState == neighbor.state)
+                    { tempState = nextState; return; }
                 }
             }
 

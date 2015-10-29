@@ -206,7 +206,9 @@ namespace NetAppsAssignmentTwo
             // Initialize progress maximum
             progress_generations.Maximum = generations.Value;
 
-            RunAutomata(rule, generations.Value);
+            bool randomize = cbRandom.Checked;
+
+            RunAutomata(rule, generations.Value, randomize);
         }
 
         /// <summary>
@@ -216,7 +218,7 @@ namespace NetAppsAssignmentTwo
         /// </summary>
         /// <param name="rule">The name of the rule to apply to the grid</param>
         /// <param name="generations">The number of times to execute the automata</param>
-        private void RunAutomata(AutomataRule rule, int generations)
+        private void RunAutomata(AutomataRule rule, int generations, bool randomize)
         {
             // Do not lock the UI thread
             computeThread = new Thread(() =>
@@ -225,7 +227,7 @@ namespace NetAppsAssignmentTwo
                 this.Invoke((Action<bool>)SetControlsEnabled, false);
 
                 // Execute the loop
-                AutomataLoop(rule, generations);
+                AutomataLoop(rule, generations, randomize);
 
                 // Compute and display the final hash, and enable the controls
                 this.Invoke((Action)DisplayHash);
@@ -240,12 +242,12 @@ namespace NetAppsAssignmentTwo
         /// </summary>
         /// <param name="rule">The skipping rule to apply</param>
         /// <param name="generations">The number of times to run the loop</param>
-        private void AutomataLoop(AutomataRule rule, int generations)
+        private void AutomataLoop(AutomataRule rule, int generations, bool randomize)
         {
             for (int gen = 1; gen <= generations; gen++)
             {
                 // Compute this generation and render
-                cellGrid.RunAutomata(rule);
+                cellGrid.RunAutomata(rule, randomize);
                 RenderImage();
 
                 // Update the generation count UI

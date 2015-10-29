@@ -28,8 +28,8 @@ namespace NetAppsAssignmentTwo
         /// (the number of cells in the grid).
         /// </summary>
         public const int
-            ROWS = 240,
-            COLS = 320;
+            ROWS = 120,
+            COLS = 160;
 
         /// <summary>
         /// The 2D array grid of cells
@@ -130,7 +130,7 @@ namespace NetAppsAssignmentTwo
         /// Run one generation of the automata on the grid.
         /// </summary>
         /// <param name="rule">The 'neighbor skipping rule' to apply</param>
-        public void RunAutomata(AutomataRule rule)
+        public void RunAutomata(AutomataRule rule, bool randomize)
         {
             // Empty multi-cast delegate
             Action automataAction = () => { };
@@ -138,16 +138,16 @@ namespace NetAppsAssignmentTwo
             // Add the OrthogonalRule automata for any rule that requires it
             if(Utility.EnumIsAnyOf<AutomataRule>(rule,
                 AutomataRule.Alternating, AutomataRule.Orthogonal, AutomataRule.CustomRule))
-                automataAction += () => RunAutomata(Cell.OrthogonalRule);
+                automataAction += () => RunAutomata(Cell.OrthogonalRule, randomize);
 
             // Add the DiagonalRule automata for any rule that requires it
             if (Utility.EnumIsAnyOf<AutomataRule>(rule,
                 AutomataRule.Alternating, AutomataRule.Diagonal))
-                automataAction += () => RunAutomata(Cell.DiagonalRule);
+                automataAction += () => RunAutomata(Cell.DiagonalRule, randomize);
 
             // Add the CustomRule automata if required
             if(rule == AutomataRule.CustomRule)
-                automataAction += () => RunAutomata(Cell.CustomRule);
+                automataAction += () => RunAutomata(Cell.CustomRule, randomize);
 
             // Run
             automataAction();
@@ -157,13 +157,13 @@ namespace NetAppsAssignmentTwo
         /// Execute the automata on every cell
         /// </summary>
         /// <param name="rule">The rule function</param>
-        private void RunAutomata(Cell.RuleDelegate rule)
+        private void RunAutomata(Cell.RuleDelegate rule, bool randomize)
         {
             // Compute the next state for each cell concurrently,
             // do not apply yet
             GridLoopParallel((x, y) =>
             {
-                cells[x, y].ComputeNextState(rule);
+                cells[x, y].ComputeNextState(rule, randomize);
             });
 
             // Apply the temp. states after computation is complete
