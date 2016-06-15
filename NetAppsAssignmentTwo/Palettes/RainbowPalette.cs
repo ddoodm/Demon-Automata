@@ -8,21 +8,31 @@ namespace NetAppsAssignmentTwo.Palettes
 {
     public class RainbowPalette : Palette
     {
-        private Brush[] rainbowPal;
+        private Color[] rainbowCol;
+        private Brush[] rainbowBrush;
 
         public RainbowPalette()
         {
-            rainbowPal = new Brush[]
+            rainbowCol = new Color[]
             {
-                Brushes.Red, Brushes.DarkViolet, Brushes.Blue,
-                Brushes.LightBlue, Brushes.Navy, Brushes.Green,
-                Brushes.Yellow, Brushes.Orange
+                Color.Red, Color.DarkViolet, Color.Blue,
+                Color.LightBlue, Color.Navy, Color.Green,
+                Color.Yellow, Color.Orange
             };
+
+            rainbowBrush = new Brush[rainbowCol.Length];
+            for (int i = 0; i < rainbowBrush.Length; i++)
+                rainbowBrush[i] = new SolidBrush(rainbowCol[i]);
+        }
+
+        public override Color StateToColor(CellState state)
+        {
+            return rainbowCol[state % rainbowCol.Length];
         }
 
         public override Brush StateToBrush(CellState state)
         {
-            return rainbowPal[state % rainbowPal.Length];
+            return rainbowBrush[state % rainbowBrush.Length];
         }
     }
 }

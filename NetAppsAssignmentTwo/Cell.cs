@@ -14,7 +14,7 @@ namespace NetAppsAssignmentTwo
         /// <summary>
         /// The visual (draw) size of the cell
         /// </summary>
-        public const int CELL_SIZE = 4;
+        public const int CELL_SIZE = 2;
 
         /// <summary>
         /// The coordinates of this cell in the grid

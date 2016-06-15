@@ -70,7 +70,7 @@ namespace NetAppsAssignmentTwo.Palettes
         /// </summary>
         public virtual Color StateToColor(CellState state)
         {
-            return clut[state];
+            return clut[state % clut.Length];
         }
 
         /// <summary>

@@ -28,8 +28,8 @@ namespace NetAppsAssignmentTwo
         /// (the number of cells in the grid).
         /// </summary>
         public const int
-            ROWS = 120,
-            COLS = 160;
+            ROWS = 240,
+            COLS = 320;
 
         /// <summary>
         /// The 2D array grid of cells
@@ -210,7 +210,7 @@ namespace NetAppsAssignmentTwo
         public void Draw(Graphics graphics)
         {
             // Clear the old set of states
-            for(int s = 0; s < CellState.NUM_STATES; s++)
+            for(int s = 1; s < CellState.NUM_STATES; s++)
                 cellRectangles[s].Clear();
 
             // Concurrently determine which batch each cell should
@@ -219,12 +219,17 @@ namespace NetAppsAssignmentTwo
             {
                 Cell currentCell = cells[x, y];
                 int stateId = currentCell.state;
+
+                if (stateId == 0)
+                    return;
+
                 lock (cellRectangles) { cellRectangles[stateId].Add(currentCell.visualRect); }
             });
 
             // Concurrently convert each list to an array
+            // Skip element 0
             Rectangle[][] rectArray = new Rectangle[CellState.NUM_STATES][];
-            Parallel.For(0, CellState.NUM_STATES, s =>
+            Parallel.For(1, CellState.NUM_STATES, s =>
             {
                 rectArray[s] = cellRectangles[s].ToArray();
             });
@@ -233,11 +238,12 @@ namespace NetAppsAssignmentTwo
             // appropriate colour from the palette
             for(int s = 0; s < CellState.NUM_STATES; s++)
             {
-                if (rectArray[s].Length < 1)
-                    continue;
-
-                Brush cellBrush = palette.StateToBrush(s);
-                graphics.FillRectangles(cellBrush, rectArray[s]);
+                // If this is the lowest depth, fill the entire screen,
+                // instead, fill the set of rectangles
+                if (s == 0)
+                    graphics.Clear(palette.StateToColor(s));
+                else if (rectArray[s] != null && rectArray[s].Length > 0)
+                    graphics.FillRectangles(palette.StateToBrush(s), rectArray[s]);
             }
         }
     }
